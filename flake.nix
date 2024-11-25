@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 {
-  description = "Shared kernel modelled after github API concepts";
+  description = "Flake for pythoneda-shared-git/github";
   inputs = rec {
     flake-utils.url = "github:numtide/flake-utils/v1.0.0";
     nixos.url = "github:NixOS/nixpkgs/24.05";
@@ -32,6 +32,15 @@
       inputs.pythoneda-shared-pythonlang-banner.follows =
         "pythoneda-shared-pythonlang-banner";
       url = "github:pythoneda-shared-pythonlang-def/domain/0.0.84";
+    };
+    pythoneda-shared-git-shared = {
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.nixos.follows = "nixos";
+      inputs.pythoneda-shared-pythonlang-banner.follows =
+        "pythoneda-shared-pythonlang-banner";
+      inputs.pythoneda-shared-pythonlang-domain.follows =
+        "pythoneda-shared-pythonlang-domain";
+      url = "github:pythoneda-shared-git-def/shared/0.0.62";
     };
   };
   outputs = inputs:
@@ -58,7 +67,7 @@
           builtins.replaceStrings [ "\n" ] [ "" ] "nixos-${nixosVersion}";
         shared = import "${pythoneda-shared-pythonlang-banner}/nix/shared.nix";
         pythoneda-shared-git-github-for =
-          { python, pythoneda-shared-pythonlang-domain }:
+          { python, pythoneda-shared-git-shared, pythoneda-shared-pythonlang-domain }:
           let
             pnameWithUnderscores =
               builtins.replaceStrings [ "-" ] [ "_" ] pname;
@@ -80,6 +89,7 @@
                 version;
               package = builtins.replaceStrings [ "." ] [ "/" ] pythonpackage;
               aiohttp = python.pkgs.aiohttp.version;
+              pythonedaSharedGitShared = pythoneda-shared-git-shared.version;
               pythonedaSharedPythonlangDomain =
                 pythoneda-shared-pythonlang-domain.version;
               src = pyprojectTomlTemplate;
@@ -95,6 +105,7 @@
             nativeBuildInputs = with python.pkgs; [ pip poetry-core ];
             propagatedBuildInputs = with python.pkgs; [
               aiohttp
+              pythoneda-shared-git-shared
               pythoneda-shared-pythonlang-domain
             ];
 
@@ -126,9 +137,7 @@
       in rec {
         defaultPackage = packages.default;
         devShells = rec {
-          default = pythoneda-shared-git-github-default;
-          pythoneda-shared-git-github-default =
-            pythoneda-shared-git-github-python312;
+          default = pythoneda-shared-git-github-python312;
           pythoneda-shared-git-github-python38 = shared.devShell-for {
             banner = "${
                 pythoneda-shared-pythonlang-banner.packages.${system}.pythoneda-shared-pythonlang-banner-python38
@@ -201,36 +210,44 @@
           };
         };
         packages = rec {
-          default = pythoneda-shared-git-github-default;
-          pythoneda-shared-git-github-default =
-            pythoneda-shared-git-github-python312;
+          default = pythoneda-shared-git-github-python312;
           pythoneda-shared-git-github-python38 =
             pythoneda-shared-git-github-for {
               python = pkgs.python38;
+              pythoneda-shared-git-shared =
+                pythoneda-shared-git-shared.packages.${system}.pythoneda-shared-git-shared-python38;
               pythoneda-shared-pythonlang-domain =
                 pythoneda-shared-pythonlang-domain.packages.${system}.pythoneda-shared-pythonlang-domain-python38;
             };
           pythoneda-shared-git-github-python39 =
             pythoneda-shared-git-github-for {
               python = pkgs.python39;
+              pythoneda-shared-git-shared =
+                pythoneda-shared-git-shared.packages.${system}.pythoneda-shared-git-shared-python39;
               pythoneda-shared-pythonlang-domain =
                 pythoneda-shared-pythonlang-domain.packages.${system}.pythoneda-shared-pythonlang-domain-python39;
             };
           pythoneda-shared-git-github-python310 =
             pythoneda-shared-git-github-for {
               python = pkgs.python310;
+              pythoneda-shared-git-shared =
+                pythoneda-shared-git-shared.packages.${system}.pythoneda-shared-git-shared-python310;
               pythoneda-shared-pythonlang-domain =
                 pythoneda-shared-pythonlang-domain.packages.${system}.pythoneda-shared-pythonlang-domain-python310;
             };
           pythoneda-shared-git-github-python311 =
             pythoneda-shared-git-github-for {
               python = pkgs.python311;
+              pythoneda-shared-git-shared =
+                pythoneda-shared-git-shared.packages.${system}.pythoneda-shared-git-shared-python311;
               pythoneda-shared-pythonlang-domain =
                 pythoneda-shared-pythonlang-domain.packages.${system}.pythoneda-shared-pythonlang-domain-python311;
             };
           pythoneda-shared-git-github-python312 =
             pythoneda-shared-git-github-for {
               python = pkgs.python312;
+              pythoneda-shared-git-shared =
+                pythoneda-shared-git-shared.packages.${system}.pythoneda-shared-git-shared-python312;
               pythoneda-shared-pythonlang-domain =
                 pythoneda-shared-pythonlang-domain.packages.${system}.pythoneda-shared-pythonlang-domain-python312;
             };
